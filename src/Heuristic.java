@@ -1,5 +1,5 @@
 
-public class Heuristic { //TODO need to test all functions
+public class Heuristic {
 
     //The following coefficients needs to be found by experimenting
     private static double stonesInStoreCoefficient = 2;
@@ -78,6 +78,7 @@ public class Heuristic { //TODO need to test all functions
         }
         return count;
     }
+
     private static boolean isStealSeedsMove(Board board, Side side, int hole){
         int stealFromHole = findStealEndHole(board, side, hole);
         if (stealFromHole > 0 && board.getSeedsOp(side, stealFromHole) > 0){
@@ -90,7 +91,7 @@ public class Heuristic { //TODO need to test all functions
         int seeds = board.getSeeds(side, hole);
         int distanceToStore = noHolesToStore(board, side, hole);
         int noHoles = board.getNoOfHoles();
-        if(seeds > noHoles * 2 + 1){ // No empty holes left
+        if(seeds > noHoles * 2 + 1 || seeds == 0){ // No empty holes left or no seeds
             return 0;
         }
         if(side == Side.NORTH){
