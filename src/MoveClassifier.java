@@ -3,7 +3,7 @@ public class MoveClassifier {
     public static boolean isFreeTurnMove(Board board, Side side, int hole){
         int stonesInHole = board.getSeeds(side, hole);
         int noOfHoles = board.getNoOfHoles();
-        if(stonesInHole % (noOfHoles*2 + 1) == noHolesToStore(board, side, hole)){
+        if(stonesInHole % (noOfHoles*2 + 1) == numHolesToStore(board, side, hole)){
             return true;
         }
         return false;
@@ -22,7 +22,7 @@ public class MoveClassifier {
 
     public static int findEndHole(Board board, Side side, int hole){
         int seeds = board.getSeeds(side, hole);
-        int distanceToStore = MoveClassifier.noHolesToStore(board, side, hole);
+        int distanceToStore = MoveClassifier.numHolesToStore(board, side, hole);
         int noHoles = board.getNoOfHoles();
         seeds = seeds % (noHoles * 2 + 1);
         if(side == Side.NORTH){
@@ -44,7 +44,7 @@ public class MoveClassifier {
         return 0;
     }
 
-    private static int noHolesToStore(Board board, Side side, int hole){
+    private static int numHolesToStore(Board board, Side side, int hole){
         if (side == Side.NORTH){
             return hole;
         }

@@ -16,12 +16,12 @@ public class Heuristic {
     }
 
     private static int stonesInHolesDiff(Board board, Side side) {
-        int stonesInOwnHoles = numberOfStonesInHoles(board, side);
-        int stonesInOppHoles = numberOfStonesInHoles(board, side.opposite());
+        int stonesInOwnHoles = numOfStonesInHoles(board, side);
+        int stonesInOppHoles = numOfStonesInHoles(board, side.opposite());
         return (stonesInOwnHoles - stonesInOppHoles);
     }
 
-    private static int numberOfStonesInHoles(Board board, Side side){
+    private static int numOfStonesInHoles(Board board, Side side){
         int stones = 0;
         for(int hole = 1; hole <= board.getNoOfHoles(); hole++){
             stones += board.getSeeds(side, hole);
@@ -65,9 +65,10 @@ public class Heuristic {
         return maxSteal;
     }
 
-    //TODO implement function that return coefficient based on how far we have reached in the game.
-    private static double getStonesInStoreCoefficient(){
-        return stonesInStoreCoefficient;
+    private static int calculateLinearIncreasingCoefficient(Board board, int minCoefficientValue, int maxCoefficientValue){
+        int maxSeedsInStore = Math.max(board.getSeedsInStore(Side.NORTH), board.getSeedsInStore(Side.SOUTH));
+        int seedsNeededToWin = board.getNoSeedsInHolesAtStart() * board.getNoOfHoles() + 1;
+        return (int) ( ( (double)maxSeedsInStore / seedsNeededToWin) * (maxCoefficientValue + 1 - minCoefficientValue) + minCoefficientValue );
     }
 
     public static double simpleHeuristic(Board board, Side side){
@@ -83,9 +84,12 @@ public class Heuristic {
             }
             return Double.NEGATIVE_INFINITY;
         }
-        return stonesInStoreCoefficient * stonesInStoreDiff(board, side)
+        int minCoefficientValue = 1;
+        int maxCoefficientValue = 10;
+        int linearIncreasingCoefficient = calculateLinearIncreasingCoefficient(board, minCoefficientValue, maxCoefficientValue);
+        return linearIncreasingCoefficient * stonesInStoreDiff(board, side)
                 + stonesInHolesCoefficient * stonesInHolesDiff(board, side)
-                + freeTurnMovesCoefficient * freeTurnMovesDiff(board, side)
+                + linearIncreasingCoefficient * freeTurnMovesDiff(board, side)
                 + maxStealSeedMoveCoefficient * maxStealMoveDiff(board, side);
     }
 }
