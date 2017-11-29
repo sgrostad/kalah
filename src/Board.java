@@ -27,6 +27,11 @@ public class Board extends Observable implements Cloneable
 	private final int holes;
 
 	/**
+	 * Number of seeds in every hole at start.
+	 */
+	private final int seeds;
+
+	/**
 	 * The board data. The first dimension of the array is 2, the second one
 	 * is the number of holes per side plus one. The data for the North side
 	 * is stored in board[NORTH_ROW][*], the data for the South side in
@@ -68,6 +73,7 @@ public class Board extends Observable implements Cloneable
     		throw new IllegalArgumentException("There has to be a non-negative number of seeds, but " + seeds + " were requested.");
 
     	this.holes = holes;
+    	this.seeds = seeds;
     	board = new int[2][holes+1]; // WARNING: potential integer overflow here!
 
     	for (int i=1; i <= holes; i++)
@@ -87,6 +93,7 @@ public class Board extends Observable implements Cloneable
     public Board (Board original)
     {
     	holes = original.holes;
+    	seeds = original.seeds;
     	board = new int[2][holes+1];
 
     	for (int i=0; i <= holes; i++)
@@ -117,7 +124,14 @@ public class Board extends Observable implements Cloneable
 		return holes;
     }
 
-    /**
+	/**
+	 * @return number of seeds in each hole at start of the game.
+	 */
+	public int getNoSeedsInHolesAtStart(){
+		return seeds;
+	}
+
+	/**
      * Get the number of seeds in a hole.
      * @param side The side the hole is located on.
      * @param hole The number of the hole.
