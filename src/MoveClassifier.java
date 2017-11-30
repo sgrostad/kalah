@@ -1,60 +1,49 @@
 public class MoveClassifier {
 
-    public static boolean isFreeTurnMove(Board board, Side side, int hole){
-        int stonesInHole = board.getSeeds(side, hole);
+    public static boolean isFreeTurnMove(Board board, Move move){
+        int stonesInHole = board.getSeeds(move.getSide(), move.getHole());
         int noOfHoles = board.getNoOfHoles();
-        if(stonesInHole % (noOfHoles*2 + 1) == numHolesToStore(board, side, hole)){
+        if(stonesInHole % (noOfHoles*2 + 1) == numHolesToStore(board, move)){
             return true;
         }
         return false;
     }
 
-    public static boolean isStealSeedsMove(Board board, Side side, int hole){
-        int stealFromHole = MoveClassifier.findEndHole(board, side, hole);
-        if (!enoughSeedsForOverFullRound(board, side, hole)
-                && board.getSeeds(side, hole) > 0
+    public static boolean isStealSeedsMove(Board board, Move move){
+        int stealFromHole = MoveClassifier.findEndHole(board, move);
+        if (!enoughSeedsForOverFullRound(board, move)
+                && board.getSeeds(move.getSide(), move.getHole()) > 0
                 && stealFromHole > 0
-                && board.getSeedsOp(side, stealFromHole) > 0){
+                && board.getSeedsOp(move.getSide(), stealFromHole) > 0
+                && board.getSeeds(move.getSide(), stealFromHole) == 0){
             return true;
         }
         return false;
     }
 
-    public static int findEndHole(Board board, Side side, int hole){
-        int seeds = board.getSeeds(side, hole);
-        int distanceToStore = MoveClassifier.numHolesToStore(board, side, hole);
+    public static int findEndHole(Board board, Move move){
+        int seeds = board.getSeeds(move.getSide(), move.getHole());
+        int distanceToStore = MoveClassifier.numHolesToStore(board, move);
         int noHoles = board.getNoOfHoles();
         seeds = seeds % (noHoles * 2 + 1);
-        if(side == Side.NORTH){
-            if(seeds < distanceToStore){
-                return hole - seeds;
-            }
-            else if(seeds > distanceToStore + noHoles){ // to many seeds already handled
-                return noHoles - (seeds - distanceToStore - noHoles);
-            }
+        if(isFreeTurnMove(board, move)){
+            return 0;
         }
-        else{ //Side.South
-            if (seeds < distanceToStore){
-                return hole + seeds;
-            }
-            else if(seeds > distanceToStore + noHoles){// to many seeds already handled
-                return seeds - distanceToStore - noHoles;
-            }
+        else if (seeds < distanceToStore){
+            return move.getHole() + seeds;
         }
-        return 0;
+        else if(seeds > distanceToStore + noHoles){// to many seeds already handled
+            return seeds - distanceToStore - noHoles;
+        }
+        return -1;
     }
 
-    private static int numHolesToStore(Board board, Side side, int hole){
-        if (side == Side.NORTH){
-            return hole;
-        }
-        else{
-            return board.getNoOfHoles() - hole + 1;
-        }
+    private static int numHolesToStore(Board board, Move move){
+        return board.getNoOfHoles() - move.getHole() + 1;
     }
 
-    private static boolean enoughSeedsForOverFullRound(Board board, Side side, int hole){
-        int seeds = board.getSeeds(side, hole);
+    private static boolean enoughSeedsForOverFullRound(Board board, Move move){
+        int seeds = board.getSeeds(move.getSide(), move.getHole());
         int noHoles = board.getNoOfHoles();
         if(seeds > noHoles * 2 + 1){
             return true;
