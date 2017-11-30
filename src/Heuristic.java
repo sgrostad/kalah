@@ -35,7 +35,7 @@ public class Heuristic {
         return ownFreeTurnMoves - oppFreeTurnMoves;
     }
 
-    public static int countFreeMoves(Board board, Side side){
+    private static int countFreeMoves(Board board, Side side){
         int count = 0;
         for(int hole = 1; hole <= board.getNoOfHoles(); hole++){
             Move move = new Move(side,hole);
@@ -52,7 +52,7 @@ public class Heuristic {
         return ownMaxStealMove - oppMaxStealMove;
     }
 
-    public static int maxStealMove(Board board, Side side){
+    private static int maxStealMove(Board board, Side side){
         int maxSteal = 0;
         for(int hole = 1; hole <= board.getNoOfHoles(); hole++){
             Move move = new Move(side,hole);
