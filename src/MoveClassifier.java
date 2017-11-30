@@ -15,13 +15,13 @@ public class MoveClassifier {
                 && board.getSeeds(move.getSide(), move.getHole()) > 0
                 && stealFromHole > 0
                 && board.getSeedsOp(move.getSide(), stealFromHole) > 0
-                && board.getSeeds(move.getSide(), stealFromHole) == 0){
+                && (board.getSeeds(move.getSide(), stealFromHole) == 0 || stealFromHole == move.getHole()) ){
             return true;
         }
         return false;
     }
 
-    public static int findEndHole(Board board, Move move){
+    public static int findEndHole(Board board, Move move){ //Returns -1 for endpoint on opposition side.
         int seeds = board.getSeeds(move.getSide(), move.getHole());
         int distanceToStore = MoveClassifier.numHolesToStore(board, move);
         int noHoles = board.getNoOfHoles();

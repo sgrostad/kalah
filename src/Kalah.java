@@ -197,7 +197,7 @@ public class Kalah
 			board.addSeedsToStore(collectingSide, seeds);
     	}
 
-    	//board.notifyObservers(move);
+    	board.notifyObservers(move);
 
     	// who's turn is it?
     	if (sowHole == 0)  // the store (implies (sowSide == move.getSide()))
