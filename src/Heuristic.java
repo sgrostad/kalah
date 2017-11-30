@@ -35,10 +35,11 @@ public class Heuristic {
         return ownFreeTurnMoves - oppFreeTurnMoves;
     }
 
-    private static int countFreeMoves(Board board, Side side){
+    public static int countFreeMoves(Board board, Side side){
         int count = 0;
         for(int hole = 1; hole <= board.getNoOfHoles(); hole++){
-            if(MoveClassifier.isFreeTurnMove(board, side, hole)){
+            Move move = new Move(side,hole);
+            if(MoveClassifier.isFreeTurnMove(board, move)){
                 count++;
             }
         }
@@ -51,12 +52,13 @@ public class Heuristic {
         return ownMaxStealMove - oppMaxStealMove;
     }
 
-    private static int maxStealMove(Board board, Side side){
+    public static int maxStealMove(Board board, Side side){
         int maxSteal = 0;
         for(int hole = 1; hole <= board.getNoOfHoles(); hole++){
-            if(MoveClassifier.isStealSeedsMove(board, side, hole)){
-                int endHole = MoveClassifier.findEndHole(board, side, hole);
-                int stealValue = board.getSeeds(side.opposite(), endHole);
+            Move move = new Move(side,hole);
+            if(MoveClassifier.isStealSeedsMove(board, move)){
+                int endHole = MoveClassifier.findEndHole(board, move);
+                int stealValue = board.getSeedsOp(side, endHole);
                 if (stealValue > maxSteal){
                     maxSteal = stealValue;
                 }
@@ -76,7 +78,6 @@ public class Heuristic {
                 + stonesInHolesCoefficient * stonesInHolesDiff(board, side);
     }
 
-    //TODO confirm that Double.POSITIVE_INFINITY works with double as return variable
     public static double advancedHeuristic(Board board, Side side){
         if (Kalah.gameOver(board)){
             if(board.getSeedsInStore(side) > board.getSeedsInStore(side.opposite())){
