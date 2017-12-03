@@ -1,5 +1,5 @@
 public class MoveDecisionMaker {
-    private static final int searchDepth = 7;
+    private static final int searchDepth = 8; //need to be even??? maybe not?
 
     //TODO Convert to iterative instead of recursive for speed
     public static Move decideMove(Board board, boolean swapAvailable, Side maximizingSide){
@@ -10,9 +10,9 @@ public class MoveDecisionMaker {
 
     private static double MinMaxAlphaBeta(BoardNode boardNode, double alpha, double beta){
         if (boardNode.getDepth() == 0 || Kalah.gameOver(boardNode.getCurrentBoard())){
-            // return Heuristic.advancedHeuristic(boardNode.getCurrentBoard(), boardNode.getMaximizingPlayer());
+            return boardNode.getCurrentHeuristic();
         }
-        if (boardNode.getNextPlayerTurn() == BoardNode.getMaximizingPlayer()){
+        if (boardNode.getNextPlayerTurn() == boardNode.getMaximizingPlayer()){
             double tempAlpha = Double.NEGATIVE_INFINITY;
             for(BoardNode child : boardNode.findChildren()){
                 if(child == null){

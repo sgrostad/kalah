@@ -17,4 +17,12 @@ public enum Side
 			default: return NORTH;  // dummy
 		}
 	}
+
+	public String toString(){
+		switch (this){
+			case NORTH: return "NORTH";
+			case SOUTH: return "SOUTH";
+			default: return "DUMMY";
+		}
+	}
 }

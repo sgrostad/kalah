@@ -1,20 +1,21 @@
 public class BoardNode {
 
-    private BoardNode parentBoardNode; //TODO for the time being not used. Remove if not needed.
     private Board currentBoard;
 
     private Move parentMove;
     private Move minMaxMove;
 
-    private static Side maximizingPlayer; //TODO look for better solution?
+    private Side maximizingPlayer; //TODO look for better solution?
 
     private Side nextPlayerTurn;
     private int depth; //TODO Agree how we define depth. Now it is decreasing when changing turn.
 
     private boolean swapAvailable;
 
+    private double currentHeuristic; // Heuristic for the nextPlayerTurn
+
+    // Only called with root node:
     public BoardNode(Board currentBoard, boolean swapAvailable, Side maximizingPlayer, int searchDepth){
-        this.parentBoardNode = null;
         this.currentBoard = currentBoard;
 
         this.maximizingPlayer = maximizingPlayer;
@@ -22,51 +23,77 @@ public class BoardNode {
 
         this.depth = searchDepth;
         this.swapAvailable = swapAvailable;
+
+        this.currentHeuristic = 0;
     }
 
-    public BoardNode(BoardNode parentBoardNode, Move parentMove, int depth){
-        this.parentBoardNode = parentBoardNode;
+    public BoardNode(BoardNode parentBoardNode, Move parentMove, Side maximizingPlayer, int depth){
         currentBoard = new Board(parentBoardNode.getCurrentBoard());
 
         this.parentMove = parentMove;
 
-        nextPlayerTurn = Kalah.makeMove(currentBoard, parentMove); // TODO need a similar function that does not report.
+        this.maximizingPlayer = maximizingPlayer;
+
+        nextPlayerTurn = Kalah.makeMove(currentBoard, parentMove, false);
 
         this.depth = depth;
         this.swapAvailable = false;
+
+        this.currentHeuristic = Heuristic.advancedHeuristic(currentBoard, maximizingPlayer);
     }
 
     public BoardNode[] findChildren(){
         BoardNode[] childBoardNodes = new BoardNode[currentBoard.getNoOfHoles() + 1];
-        int childNo = 0;
+        int childNum = 0;
         for(int hole = 1; hole <= currentBoard.getNoOfHoles(); hole++){
             Move move = new Move(nextPlayerTurn, hole);
             if(Kalah.isLegalMove(currentBoard, move)){
-                if(true/*MoveClassifier.isFreeTurnMove(board, move)*/){
-                    childBoardNodes[childNo] = new BoardNode(this, move, depth);
+                if(MoveClassifier.isFreeTurnMove(currentBoard, move)){
+                    childBoardNodes[childNum] = new BoardNode(this, move, maximizingPlayer, depth);
                 }
                 else{
-                childBoardNodes[childNo] = new BoardNode(this, move, depth - 1);
+                childBoardNodes[childNum] = new BoardNode(this, move, maximizingPlayer,depth - 1);
                 }
-                childNo++;
+                childNum++;
             }
         }
         if(swapAvailable){
-        //TODO find out how to handle this.
+            //TODO Something like this?
+        //childBoardNodes[childNum] = new BoardNode(this, null, maximizingPlayer.opposite(), depth-1);
+        childNum++;
         }
-        for(; childNo <= childBoardNodes.length; childNo++){ // Is this necessary?
-        childBoardNodes[childNo] = null;
+        for(; childNum < childBoardNodes.length; childNum++){
+            childBoardNodes[childNum] = null;
         }
-        sortChildren();
+        insertionSortChildren(childBoardNodes);
         return childBoardNodes;
     }
 
-    private void sortChildren(){
-        //TODO sort children based on currentHeuristic by some simple insertion sort or something.
-        //double currentHeuristic = Heuristic.advancedHeurisitic(currentBoard, nextPlayerTurn.getSide()); With this heuristic, always sort decreasing
+    private void insertionSortChildren(BoardNode[] childBoardNodes){
+        for(int i = 1; i < childBoardNodes.length; i++){
+            boolean sorting = true;
+            int currentPlace = i;
+            while (sorting){
+                if(currentPlace == 0){
+                    sorting = false;
+                }
+                else if (childBoardNodes[currentPlace] != null &&
+                        (childBoardNodes[currentPlace - 1] == null ||
+                         childBoardNodes[currentPlace].getCurrentHeuristic() >
+                         childBoardNodes[currentPlace - 1].getCurrentHeuristic()) ){
+                    BoardNode tempNode = childBoardNodes[currentPlace-1];
+                    childBoardNodes[currentPlace - 1] = childBoardNodes[currentPlace];
+                    childBoardNodes[currentPlace] = tempNode;
+                    currentPlace--;
+                }
+                else {
+                    sorting = false;
+                }
+            }
+        }
     }
 
-    public static Side getMaximizingPlayer() {
+    public Side getMaximizingPlayer() {
         return maximizingPlayer;
     }
 
@@ -93,4 +120,6 @@ public class BoardNode {
     public void setMinMaxMove(Move minMaxMove) {
         this.minMaxMove = minMaxMove;
     }
+
+    public double getCurrentHeuristic(){ return currentHeuristic; }
 }
