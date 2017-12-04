@@ -1,3 +1,4 @@
+package MKAgent;
 import java.io.BufferedReader;
 import java.io.EOFException;
 import java.io.IOException;
@@ -53,44 +54,66 @@ public class Main
 	 */
 	public static void main(String[] args)
 	{
-		// example code:
+		// TODO: implement
+		//System.out.println("MOVE;2");
+    try
+{
+  String s;
+  Side side = Side.NORTH;
+  while (true)
+  {
+    System.err.println();
+    s = recvMsg();
+    System.err.print("Received: " + s);
+    try {
+      MsgType mt = Protocol.getMessageType(s);
+      switch (mt)
+      {
+        case START: System.err.println("A start.");
+          boolean first = Protocol.interpretStartMsg(s);
+          System.err.println("Starting player? " + first);	
+          
+          // If we are on the south side, we're going first.
+          if (first)
+          {
+        	  side = Side.SOUTH;
+        	  
+        	  // Make a dummy move (2)
+        	  sendMsg(Protocol.createMoveMsg(2));
+          }
+          break;
+        case STATE: System.err.println("A state.");
+          Board b = new Board(7,7);
+          Protocol.MoveTurn r = Protocol.interpretStateMsg (s, b);
+          System.err.println("This was the move: " + r.move);
+          System.err.println("Is the game over? " + r.end);
+          if (!r.end) System.err.println("Is it our turn again? " + r.again);
+          System.err.print("The board:\n" + b);
+          
+          // If it's our turn, make the first legal move possible
+          if (r.again)
+          {
+        	  int i = 1;
+        	  Move move = new Move(side, i);
+        	  while (!(Kalah.isLegalMove(b, move)))
+        	  {
+        		  i++;
+        		  move = new Move(side, i);
+        	  }
+        	  sendMsg(Protocol.createMoveMsg(i));
+          }
+          break;
+        case END: System.err.println("An end. Bye bye!"); return;
+      }
 
-		try
-		{
-			String s;
-			while (true)
-			{
-				System.err.println();
-				s = recvMsg();
-				System.err.print("Received: " + s);
-				try {
-					MsgType mt = Protocol.getMessageType(s);
-					switch (mt)
-					{
-						case START: System.err.println("A start.");
-							boolean first = Protocol.interpretStartMsg(s);
-							System.err.println("Starting player? " + first);
-							break;
-						case STATE: System.err.println("A state.");
-							Board b = new Board(7,7);
-							Protocol.MoveTurn r = Protocol.interpretStateMsg (s, b);
-							System.err.println("This was the move: " + r.move);
-							System.err.println("Is the game over? " + r.end);
-							if (!r.end) System.err.println("Is it our turn again? " + r.again);
-							System.err.print("The board:\n" + b);
-							break;
-						case END: System.err.println("An end. Bye bye!"); return;
-					}
-
-				} catch (InvalidMessageException e) {
-					System.err.println(e.getMessage());
-				}
-			}
-		}
-		catch (IOException e)
-		{
-			System.err.println("This shouldn't happen: " + e.getMessage());
-		}
-
-	}
+    } catch (InvalidMessageException e) {
+      System.err.println(e.getMessage());
+    }
+  }
 }
+catch (IOException e)
+{
+  System.err.println("This shouldn't happen: " + e.getMessage());
+}
+	}
+}	
