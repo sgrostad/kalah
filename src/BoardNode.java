@@ -1,21 +1,25 @@
 public class BoardNode {
 
+    private BoardNode[] childBoardNodes;
+
     private Board currentBoard;
 
     private Move parentMove;
     private Move minMaxMove;
 
-    private Side maximizingPlayer; //TODO look for better solution?
+    private Side maximizingPlayer;
 
     private Side nextPlayerTurn;
-    private int depth; //TODO Agree how we define depth. Now it is decreasing when changing turn.
+    private int depth; //TODO Agree how we define depth. Now it is decreasing only when changing turn.
 
     private boolean swapAvailable;
 
-    private double currentHeuristic; // Heuristic for the nextPlayerTurn
+    private double currentHeuristic;
 
     // Only called with root node:
     public BoardNode(Board currentBoard, boolean swapAvailable, Side maximizingPlayer, int searchDepth){
+        childBoardNodes = null;
+
         this.currentBoard = currentBoard;
 
         this.maximizingPlayer = maximizingPlayer;
@@ -28,6 +32,8 @@ public class BoardNode {
     }
 
     public BoardNode(BoardNode parentBoardNode, Move parentMove, Side maximizingPlayer, int depth){
+        this.childBoardNodes = null;
+
         currentBoard = new Board(parentBoardNode.getCurrentBoard());
 
         this.parentMove = parentMove;
@@ -43,7 +49,7 @@ public class BoardNode {
     }
 
     public BoardNode[] findChildren(){
-        BoardNode[] childBoardNodes = new BoardNode[currentBoard.getNoOfHoles() + 1];
+        childBoardNodes = new BoardNode[currentBoard.getNoOfHoles() + 1];
         int childNum = 0;
         for(int hole = 1; hole <= currentBoard.getNoOfHoles(); hole++){
             Move move = new Move(nextPlayerTurn, hole);
@@ -58,12 +64,9 @@ public class BoardNode {
             }
         }
         if(swapAvailable){
-            //TODO Something like this?
-        //childBoardNodes[childNum] = new BoardNode(this, null, maximizingPlayer.opposite(), depth-1);
-        childNum++;
-        }
-        for(; childNum < childBoardNodes.length; childNum++){
-            childBoardNodes[childNum] = null;
+            //TODO Double-check this. Does it makes sense to decrease depth or is it correct?
+            childBoardNodes[childNum] = new BoardNode(this, null, maximizingPlayer.opposite(), depth);
+            childNum++;
         }
         insertionSortChildren(childBoardNodes);
         return childBoardNodes;

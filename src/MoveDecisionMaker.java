@@ -1,11 +1,11 @@
 public class MoveDecisionMaker {
+
     private static final int searchDepth = 8; //need to be even??? maybe not?
 
-    //TODO Convert to iterative instead of recursive for speed
-    public static Move decideMove(Board board, boolean swapAvailable, Side maximizingSide){
+    public static BoardNode decideMove(Board board, boolean swapAvailable, Side maximizingSide){
         BoardNode rootNode = new BoardNode(board, swapAvailable , maximizingSide, searchDepth);
         MinMaxAlphaBeta(rootNode, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
-        return rootNode.getMinMaxMove();
+        return rootNode;
     }
 
     private static double MinMaxAlphaBeta(BoardNode boardNode, double alpha, double beta){
