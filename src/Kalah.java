@@ -54,7 +54,7 @@ public class Kalah
      */
     public Side makeMove (Move move)
     {
-    	return makeMove(board, move);
+    	return makeMove(board, move, true);
     }
 
     /**
@@ -95,7 +95,7 @@ public class Kalah
      * @see #gameOver(Board)
      * @see java.util.Observable#notifyObservers(Object)
      */
-    public static Side makeMove (Board board, Move move)
+    public static Side makeMove (Board board, Move move, boolean report)
     {
 		/* from the documentation:
 		  "1. The counters are lifted from this hole and sown in anti-clockwise direction, starting
@@ -196,8 +196,9 @@ public class Kalah
     		}
 			board.addSeedsToStore(collectingSide, seeds);
     	}
-
-    	board.notifyObservers(move);
+		if (report) {
+			board.notifyObservers(move);
+		}
 
     	// who's turn is it?
     	if (sowHole == 0)  // the store (implies (sowSide == move.getSide()))
