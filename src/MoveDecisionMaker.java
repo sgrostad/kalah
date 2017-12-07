@@ -27,7 +27,7 @@ public class MoveDecisionMaker {
                     break;
                 }
             }
-
+            gameTreeNode.removeBadChildren();
             return tempAlpha;
         }
         else {
@@ -45,6 +45,7 @@ public class MoveDecisionMaker {
                     break;
                 }
             }
+            gameTreeNode.removeBadChildren();
             return beta;
         }
     }

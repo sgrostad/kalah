@@ -17,10 +17,10 @@ public class GameTreeNode {
     private double currentHeuristic;
 
     // Only called with root node:
-
     public GameTreeNode(Board currentBoard, boolean swapAvailable, Side maximizingPlayer, int searchDepth){
         childGameTreeNodes = null;
         this.currentBoard = currentBoard;
+        this.parentMove = null;
         this.maximizingPlayer = maximizingPlayer;
         this.nextPlayerTurn = maximizingPlayer;
         this.depth = searchDepth;
@@ -139,4 +139,25 @@ public class GameTreeNode {
     }
 
     public double getCurrentHeuristic(){ return currentHeuristic; }
+
+    public void removeBadChildren(){
+        for (int i = 0; i < childGameTreeNodes.length; i++){
+            if (childGameTreeNodes[i] != null && notMinMaxMove(childGameTreeNodes[i])){
+                childGameTreeNodes[i] = null;
+            }
+        }
+    }
+
+    private boolean notMinMaxMove(GameTreeNode child){
+        if (minMaxMove == null && child.parentMove != null){
+            return true;
+        }
+        else if (minMaxMove == null && child.parentMove == null){
+            return false;
+        }
+        else if (minMaxMove.getHole() == child.parentMove.getHole()){
+            return false;
+        }
+        return true;
+    }
 }
