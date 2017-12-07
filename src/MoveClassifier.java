@@ -3,10 +3,20 @@ public class MoveClassifier {
     public static boolean isFreeTurnMove(Board board, Move move){
         int stonesInHole = board.getSeeds(move.getSide(), move.getHole());
         int noOfHoles = board.getNoOfHoles();
-        if(stonesInHole % (noOfHoles*2 + 1) == numHolesToStore(board, move)){
+        if (stonesInHole % (noOfHoles*2 + 1) == numHolesToStore(board, move) && !isFirstMove(board)){
             return true;
         }
         return false;
+    }
+
+    public static boolean isFirstMove(Board board){
+        int seeds = board.getNoSeedsInHolesAtStart();
+        for(int hole = 1; hole <= board.getNoOfHoles(); hole++){
+            if (board.getSeeds(Side.SOUTH, hole) != seeds && board.getSeeds(Side.NORTH, hole) != seeds){
+                return false;
+            }
+        }
+        return true;
     }
 
     public static boolean isStealSeedsMove(Board board, Move move){

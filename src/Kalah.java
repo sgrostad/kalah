@@ -117,6 +117,7 @@ public class Kalah
 
 
     	// pick seeds:
+		boolean firstTurn = MoveClassifier.isFirstMove(board);
     	int seedsToSow = board.getSeeds(move.getSide(), move.getHole());
     	board.setSeeds(move.getSide(), move.getHole(), 0);
 
@@ -201,7 +202,7 @@ public class Kalah
 		}
 
     	// who's turn is it?
-    	if (sowHole == 0)  // the store (implies (sowSide == move.getSide()))
+    	if (sowHole == 0 && !firstTurn)  // the store (implies (sowSide == move.getSide()))
     		return move.getSide();  // move again
     	else
     		return move.getSide().opposite();
