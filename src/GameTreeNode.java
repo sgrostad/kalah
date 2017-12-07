@@ -88,10 +88,10 @@ public class GameTreeNode {
                 child.setCurrentHeuristic(smallSearchRoot.getBottomHeuristic());
             }
         }
-        insertionSortChildren(childGameTreeNodes);
+        insertionSortChildren(childGameTreeNodes, maximizingPlayer == nextPlayerTurn);
     }
 
-    private void insertionSortChildren(GameTreeNode[] childGameTreeNodes){
+    private void insertionSortChildren(GameTreeNode[] childGameTreeNodes, boolean heuristicsWillBeDecreasing){
         for(int i = 1; i < childGameTreeNodes.length; i++){
             boolean sorting = true;
             int currentPlace = i;
@@ -99,10 +99,17 @@ public class GameTreeNode {
                 if(currentPlace == 0){
                     sorting = false;
                 }
-                else if (childGameTreeNodes[currentPlace] != null &&
-                        (childGameTreeNodes[currentPlace - 1] == null ||
-                         childGameTreeNodes[currentPlace].getCurrentHeuristic() >
-                         childGameTreeNodes[currentPlace - 1].getCurrentHeuristic()) ){
+                else if (childGameTreeNodes[currentPlace] != null && heuristicsWillBeDecreasing &&
+                        childGameTreeNodes[currentPlace].getCurrentHeuristic() >
+                         childGameTreeNodes[currentPlace - 1].getCurrentHeuristic()){
+                    GameTreeNode tempNode = childGameTreeNodes[currentPlace-1];
+                    childGameTreeNodes[currentPlace - 1] = childGameTreeNodes[currentPlace];
+                    childGameTreeNodes[currentPlace] = tempNode;
+                    currentPlace--;
+                }
+                else if (childGameTreeNodes[currentPlace] != null && !heuristicsWillBeDecreasing &&
+                        childGameTreeNodes[currentPlace].getCurrentHeuristic() <
+                                childGameTreeNodes[currentPlace - 1].getCurrentHeuristic()){
                     GameTreeNode tempNode = childGameTreeNodes[currentPlace-1];
                     childGameTreeNodes[currentPlace - 1] = childGameTreeNodes[currentPlace];
                     childGameTreeNodes[currentPlace] = tempNode;
