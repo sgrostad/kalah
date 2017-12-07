@@ -66,6 +66,7 @@ public class GameTreeNode {
             childGameTreeNodes[childNum] = new GameTreeNode(this, null, maximizingPlayer.opposite(), depth, givenHeuristicObject);
             childNum++;
         }
+
         insertionSortChildren(childGameTreeNodes);
         return childGameTreeNodes;
     }
@@ -126,6 +127,9 @@ public class GameTreeNode {
     }
 
     public Move getParentMove() {
+        //if (this.parentMove == null)
+        //  System.out.println("Parent was null");
+
         return parentMove;
     }
 
@@ -142,4 +146,28 @@ public class GameTreeNode {
     }
 
     public double getCurrentHeuristic(){ return currentHeuristic; }
+
+
+
+
+     public void removeBadChildren(){
+         for (int i = 0; i < childGameTreeNodes.length; i++){
+             if (childGameTreeNodes[i] != null && notMinMaxMove(childGameTreeNodes[i])){
+                 childGameTreeNodes[i] = null;
+             }
+         }
+     }
+ 
+     private boolean notMinMaxMove(GameTreeNode child){
+         if (minMaxMove == null && child.parentMove != null){
+             return true;
+         }
+         else if (minMaxMove == null && child.parentMove == null){
+             return false;
+         }
+         else if (minMaxMove.getHole() == child.parentMove.getHole()){
+             return false;
+         }
+         return true;
+     }
 }

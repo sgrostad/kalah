@@ -1,6 +1,6 @@
 public class MoveDecisionMaker {
 
-    private static final int searchDepth = 6; //need to be even??? maybe not?
+    private static final int searchDepth = 10; //need to be even??? maybe not?
 
     public MoveDecisionMaker()
     {
@@ -32,7 +32,7 @@ public class MoveDecisionMaker {
                     break;
                 }
             }
-
+            gameTreeNode.removeBadChildren();
             return tempAlpha;
         }
         else {
@@ -50,7 +50,11 @@ public class MoveDecisionMaker {
                     break;
                 }
             }
+            gameTreeNode.removeBadChildren();
             return beta;
         }
     }
+
+
+
 }

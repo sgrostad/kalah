@@ -8,10 +8,11 @@ public class SimpleGamePlayer {
         Move move;
         Side botSide = Side.NORTH;
         Side computerSide = botSide.opposite();
-        Scanner reader = new Scanner(System.in);
+        //Scanner reader = new Scanner(System.in);
         boolean firstTurn = false;
-        Heuristic botHeuristic = new Heuristic(0.3,0.3,0.7);
-        Heuristic computerHeuristic = new Heuristic(0.5,0.5,0.5);
+        Heuristic botHeuristic = new Heuristic(7,5,2);
+        
+        Heuristic computerHeuristic = new Heuristic(5,5,5);
 
         MoveDecisionMaker computerDecisionMaker = new MoveDecisionMaker();
         MoveDecisionMaker botDecisionMaker = new MoveDecisionMaker();
@@ -51,6 +52,8 @@ public class SimpleGamePlayer {
                     root = computerDecisionMaker.decideMove(board, false, computerSide, computerHeuristic);
                 }
                 move = root.getMinMaxMove();
+
+                
                 System.out.println("Computer moved from hole: " + move.getHole());
                 turnNumber++;
                 System.out.println("Turn number is "+ turnNumber);

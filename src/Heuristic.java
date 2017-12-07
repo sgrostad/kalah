@@ -2,12 +2,12 @@
 public class Heuristic {
 
     //The following coefficients needs to be found by experimenting
-    private double stonesInStoreCoefficient = 2;
-    private double stonesInHolesCoefficient = 0.5;
-    private double freeTurnMovesCoefficient = 0.5;
-    private double maxStealSeedMoveCoefficient = 0.5;
+    private int stonesInStoreCoefficient = 2;
+    private int stonesInHolesCoefficient = 5;
+    private int freeTurnMovesCoefficient = 5;
+    private int maxStealSeedMoveCoefficient = 5;
 
-    public Heuristic (double givenStoresInHoles, double givenFreeTurnMoves, double givenStealMove)
+    public Heuristic (int givenStoresInHoles, int givenFreeTurnMoves, int givenStealMove)
     {
       this.stonesInHolesCoefficient = givenStoresInHoles;
       this.freeTurnMovesCoefficient = givenFreeTurnMoves;
@@ -86,18 +86,18 @@ public class Heuristic {
     }
 
     public double advancedHeuristic(Board board, Side side){
-        if (Kalah.gameOver(board)){
-            if(board.getSeedsInStore(side) > board.getSeedsInStore(side.opposite())){
-                return Double.POSITIVE_INFINITY;
-            }
-            return Double.NEGATIVE_INFINITY;
-        }
+     //   if (Kalah.gameOver(board)){
+            //if(board.getSeedsInStore(side) > board.getSeedsInStore(side.opposite())){
+           //     return Double.POSITIVE_INFINITY;
+           // }
+           // return Double.NEGATIVE_INFINITY;
+     //   }
         int minCoefficientValue = 1;
         int maxCoefficientValue = 10;
         int linearIncreasingCoefficient = calculateLinearIncreasingCoefficient(board, minCoefficientValue, maxCoefficientValue);
         return linearIncreasingCoefficient * stonesInStoreDiff(board, side)
-                + this.stonesInHolesCoefficient * stonesInHolesDiff(board, side)
-                + linearIncreasingCoefficient * freeTurnMovesDiff(board, side)
-                + this.maxStealSeedMoveCoefficient * maxStealMoveDiff(board, side);
+                + this.stonesInHolesCoefficient /*linearIncreasingCoefficient*/ * stonesInHolesDiff(board, side)
+                + this.freeTurnMovesCoefficient /*linearIncreasingCoefficient*/ * freeTurnMovesDiff(board, side)
+                + this.maxStealSeedMoveCoefficient /*linearIncreasingCoefficient*/ * maxStealMoveDiff(board, side);
     }
 }
