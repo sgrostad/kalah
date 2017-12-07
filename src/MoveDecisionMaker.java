@@ -8,6 +8,12 @@ public class MoveDecisionMaker {
         return rootNode;
     }
 
+    public static GameTreeNode decideMove(Board board, boolean swapAvailable, Side maximizingSide, int depth){
+        GameTreeNode rootNode = new GameTreeNode(board, swapAvailable , maximizingSide, depth);
+        MinMaxAlphaBeta(rootNode, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
+        return rootNode;
+    }
+
     private static double MinMaxAlphaBeta(GameTreeNode gameTreeNode, double alpha, double beta){
         if (gameTreeNode.getDepth() == 0 || Kalah.gameOver(gameTreeNode.getCurrentBoard())){
             return gameTreeNode.getCurrentHeuristic();
@@ -21,13 +27,12 @@ public class MoveDecisionMaker {
                 tempAlpha = Math.max(tempAlpha, MinMaxAlphaBeta(child, alpha, beta) );
                 if (tempAlpha > alpha){
                     alpha = tempAlpha;
-                    gameTreeNode.setMinMaxMove(child.getParentMove());
+                    gameTreeNode.setBestChildGameTreeNode(child);
                 }
                 if(beta <= alpha){
                     break;
                 }
             }
-            gameTreeNode.removeBadChildren();
             return tempAlpha;
         }
         else {
@@ -39,14 +44,15 @@ public class MoveDecisionMaker {
                 tempBeta = Math.min(tempBeta, MinMaxAlphaBeta(child, alpha, beta));
                 if (tempBeta < beta){
                     beta = tempBeta;
-                    gameTreeNode.setMinMaxMove(child.getParentMove());
+                    gameTreeNode.setBestChildGameTreeNode(child);
                 }
                 if(beta <= alpha){
                     break;
                 }
             }
-            gameTreeNode.removeBadChildren();
             return beta;
         }
     }
+
+    public static int getSearchDepth(){return searchDepth;}
 }
