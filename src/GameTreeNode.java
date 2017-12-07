@@ -15,10 +15,11 @@ public class GameTreeNode {
     private boolean swapAvailable;
 
     private double currentHeuristic;
+    private Heuristic heuristicObject;
 
     // Only called with root node:
 
-    public GameTreeNode(Board currentBoard, boolean swapAvailable, Side maximizingPlayer, int searchDepth){
+    public GameTreeNode(Board currentBoard, boolean swapAvailable, Side maximizingPlayer, int searchDepth, Heuristic givenHeuristicObject){
         childGameTreeNodes = null;
         this.currentBoard = currentBoard;
         this.maximizingPlayer = maximizingPlayer;
@@ -26,9 +27,10 @@ public class GameTreeNode {
         this.depth = searchDepth;
         this.swapAvailable = swapAvailable;
         this.currentHeuristic = 0;
+        this.heuristicObject = givenHeuristicObject;
     }
 
-    public GameTreeNode(GameTreeNode parentGameTreeNode, Move parentMove, Side maximizingPlayer, int depth){
+    public GameTreeNode(GameTreeNode parentGameTreeNode, Move parentMove, Side maximizingPlayer, int depth, Heuristic givenHeuristicObject){
         this.childGameTreeNodes = null;
         currentBoard = new Board(parentGameTreeNode.getCurrentBoard());
         this.parentMove = parentMove;
@@ -41,26 +43,27 @@ public class GameTreeNode {
         }
         this.depth = depth;
         this.swapAvailable = (parentGameTreeNode.isSwapAvailable() && MoveClassifier.isFirstMove(parentGameTreeNode.getCurrentBoard()) );
-        this.currentHeuristic = Heuristic.advancedHeuristic(currentBoard, maximizingPlayer);
+        this.heuristicObject = givenHeuristicObject;
+        this.currentHeuristic = givenHeuristicObject.advancedHeuristic(currentBoard, maximizingPlayer);
     }
 
-    public GameTreeNode[] findChildren(){
+    public GameTreeNode[] findChildren(Heuristic givenHeuristicObject){
         childGameTreeNodes = new GameTreeNode[findNumLegalMoves()];
         int childNum = 0;
         for(int hole = 1; hole <= currentBoard.getNoOfHoles(); hole++){
             Move move = new Move(nextPlayerTurn, hole);
             if(Kalah.isLegalMove(currentBoard, move)){
                 if(MoveClassifier.isFreeTurnMove(currentBoard, move)){
-                    childGameTreeNodes[childNum] = new GameTreeNode(this, move, maximizingPlayer, depth);
+                    childGameTreeNodes[childNum] = new GameTreeNode(this, move, maximizingPlayer, depth, givenHeuristicObject);
                 }
                 else{
-                    childGameTreeNodes[childNum] = new GameTreeNode(this, move, maximizingPlayer,depth - 1);
+                    childGameTreeNodes[childNum] = new GameTreeNode(this, move, maximizingPlayer,depth - 1, givenHeuristicObject);
                 }
                 childNum++;
             }
         }
         if(swapAvailable && !MoveClassifier.isFirstMove(currentBoard)){
-            childGameTreeNodes[childNum] = new GameTreeNode(this, null, maximizingPlayer.opposite(), depth);
+            childGameTreeNodes[childNum] = new GameTreeNode(this, null, maximizingPlayer.opposite(), depth, givenHeuristicObject);
             childNum++;
         }
         insertionSortChildren(childGameTreeNodes);
