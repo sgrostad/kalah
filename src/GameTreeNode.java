@@ -82,9 +82,16 @@ public class GameTreeNode {
     }
 
     private void sortChildren(GameTreeNode[] childGameTreeNodes){
-        if(MoveDecisionMaker.getSearchDepth() - depth < 3 && false) { //TODO Remove false and experiment with this
+        int sortDepth;
+        if(depth > 8 ) { //TODO experiment with this
+            sortDepth = 2;
+        }
+        else {
+            sortDepth = 1;
+        }
+        if (depth > 6){
             for (GameTreeNode child : childGameTreeNodes) {
-                GameTreeNode smallSearchRoot = MoveDecisionMaker.decideMove(child.currentBoard, false, maximizingPlayer, 2);
+                GameTreeNode smallSearchRoot = MoveDecisionMaker.decideMove(child.currentBoard, false, maximizingPlayer, sortDepth);
                 child.setCurrentHeuristic(smallSearchRoot.getBottomHeuristic());
             }
         }
