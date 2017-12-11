@@ -82,16 +82,23 @@ public class GameTreeNode {
     }
 
     private void sortChildren(GameTreeNode[] childGameTreeNodes){
-        if(MoveDecisionMaker.getSearchDepth() - depth < 3 && false) { //TODO Remove false and experiment with this
+        int sortDepth;
+        if(depth > 8 ) { //TODO experiment with this
+            sortDepth = 2;
+        }
+        else {
+            sortDepth = 1;
+        }
+        if (depth > 6){
             for (GameTreeNode child : childGameTreeNodes) {
-                GameTreeNode smallSearchRoot = MoveDecisionMaker.decideMove(child.currentBoard, false, maximizingPlayer, 2);
+                GameTreeNode smallSearchRoot = MoveDecisionMaker.decideMove(child.currentBoard, false, maximizingPlayer, sortDepth);
                 child.setCurrentHeuristic(smallSearchRoot.getBottomHeuristic());
             }
         }
-        insertionSortChildren(childGameTreeNodes);
+        insertionSortChildren(childGameTreeNodes, maximizingPlayer == nextPlayerTurn);
     }
 
-    private void insertionSortChildren(GameTreeNode[] childGameTreeNodes){
+    private void insertionSortChildren(GameTreeNode[] childGameTreeNodes, boolean heuristicsWillBeDecreasing){
         for(int i = 1; i < childGameTreeNodes.length; i++){
             boolean sorting = true;
             int currentPlace = i;
@@ -99,10 +106,17 @@ public class GameTreeNode {
                 if(currentPlace == 0){
                     sorting = false;
                 }
-                else if (childGameTreeNodes[currentPlace] != null &&
-                        (childGameTreeNodes[currentPlace - 1] == null ||
-                         childGameTreeNodes[currentPlace].getCurrentHeuristic() >
-                         childGameTreeNodes[currentPlace - 1].getCurrentHeuristic()) ){
+                else if (childGameTreeNodes[currentPlace] != null && heuristicsWillBeDecreasing &&
+                        childGameTreeNodes[currentPlace].getCurrentHeuristic() >
+                         childGameTreeNodes[currentPlace - 1].getCurrentHeuristic()){
+                    GameTreeNode tempNode = childGameTreeNodes[currentPlace-1];
+                    childGameTreeNodes[currentPlace - 1] = childGameTreeNodes[currentPlace];
+                    childGameTreeNodes[currentPlace] = tempNode;
+                    currentPlace--;
+                }
+                else if (childGameTreeNodes[currentPlace] != null && !heuristicsWillBeDecreasing &&
+                        childGameTreeNodes[currentPlace].getCurrentHeuristic() <
+                                childGameTreeNodes[currentPlace - 1].getCurrentHeuristic()){
                     GameTreeNode tempNode = childGameTreeNodes[currentPlace-1];
                     childGameTreeNodes[currentPlace - 1] = childGameTreeNodes[currentPlace];
                     childGameTreeNodes[currentPlace] = tempNode;
