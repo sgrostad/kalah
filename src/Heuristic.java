@@ -2,12 +2,12 @@
 public class Heuristic {
 
     //The following coefficients needs to be found by experimenting
-    private int stonesInStoreCoefficient = 2;
-    private int stonesInHolesCoefficient = 5;
-    private int freeTurnMovesCoefficient = 5;
-    private int maxStealSeedMoveCoefficient = 5;
+    private double stonesInStoreCoefficient = 0.2;
+    private double stonesInHolesCoefficient = 0.5;
+    private double freeTurnMovesCoefficient = 0.5;
+    private double maxStealSeedMoveCoefficient = 0.5;
 
-    public Heuristic (int givenStoresInHoles, int givenFreeTurnMoves, int givenStealMove)
+    public Heuristic (double givenStoresInHoles, double givenFreeTurnMoves, double givenStealMove)
     {
       this.stonesInHolesCoefficient = givenStoresInHoles;
       this.freeTurnMovesCoefficient = givenFreeTurnMoves;

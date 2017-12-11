@@ -3,16 +3,18 @@ import java.util.Scanner;
 public class SimpleGamePlayer {
 
     public static void main(String[] args){
-        Board board = new Board(7,7);
+        Board board = new Board(6,6);
         Side turn = Side.SOUTH;
         Move move;
         Side botSide = Side.NORTH;
         Side computerSide = botSide.opposite();
         //Scanner reader = new Scanner(System.in);
         boolean firstTurn = false;
-        Heuristic botHeuristic = new Heuristic(7,5,2);
+        Heuristic botHeuristic = new Heuristic(Double.parseDouble(args[0]), 
+                                               Double.parseDouble(args[1]),
+                                               Double.parseDouble(args[2]));
         
-        Heuristic computerHeuristic = new Heuristic(5,5,5);
+        Heuristic computerHeuristic = new Heuristic(0.5,0.5,0.5);
 
         MoveDecisionMaker computerDecisionMaker = new MoveDecisionMaker();
         MoveDecisionMaker botDecisionMaker = new MoveDecisionMaker();
@@ -22,8 +24,10 @@ public class SimpleGamePlayer {
 
         
         while(!Kalah.gameOver(board)){
-            System.out.println(board.toString());
-            System.out.println(turn.toString() + " Bot's turn:");
+    //        System.out.println(board.toString());
+            
+    //        System.out.println(turn.toString() + " Bot's turn:");
+            
             if (turn == botSide) {
                 //System.out.println("Current bot Heuristic: " + Heuristic.advancedHeuristic(board, playerSide));
                 //System.out.println("Choose hole: ");
@@ -33,6 +37,7 @@ public class SimpleGamePlayer {
                 //} else {
                 //    move = new Move(playerSide, hole);
             //    root = botDecisionMaker.decideMove(board, false, botSide, botHeuristic);
+               
                 if (firstTurn) {
                     root = computerDecisionMaker.decideMove(board, false, botSide, botHeuristic);
                     firstTurn = false;
@@ -41,12 +46,12 @@ public class SimpleGamePlayer {
                 }
                 move = root.getMinMaxMove();
                 turnNumber++;
-                System.out.println("Turn number is "+ turnNumber);
+    //            System.out.println("Turn number is "+ turnNumber);
 
             }
             else {
                 if (firstTurn) {
-                    root = computerDecisionMaker.decideMove(board, false, computerSide, computerHeuristic);
+                    root = computerDecisionMaker.decideMove(board, true, computerSide, computerHeuristic);
                     firstTurn = false;
                 } else {
                     root = computerDecisionMaker.decideMove(board, false, computerSide, computerHeuristic);
@@ -54,9 +59,9 @@ public class SimpleGamePlayer {
                 move = root.getMinMaxMove();
 
                 
-                System.out.println("Computer moved from hole: " + move.getHole());
+                //System.out.println("Computer moved from hole: " + move.getHole());
                 turnNumber++;
-                System.out.println("Turn number is "+ turnNumber);
+    //            System.out.println("Turn number is "+ turnNumber);
             }
             
             if (move != null){
@@ -67,8 +72,11 @@ public class SimpleGamePlayer {
                 botSide = botSide.opposite();
                 computerSide = computerSide.opposite();
             }
-        }
+        }//while
         //reader.close();
         System.out.println(board.toString());
+        System.out.println("GAME " + args[3] +" IS OVER ON TURN " + turnNumber);
+        System.out.println();
+
     }
 }

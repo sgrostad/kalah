@@ -7,54 +7,57 @@ public class MoveDecisionMaker {
 
     }
 
-    public GameTreeNode decideMove(Board board, boolean swapAvailable, Side maximizingSide, Heuristic givenHeuristic){
-        GameTreeNode rootNode = new GameTreeNode(board, swapAvailable , maximizingSide, searchDepth, givenHeuristic);
-        MinMaxAlphaBeta(rootNode, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, givenHeuristic);
+    public static GameTreeNode decideMove(Board board, boolean swapAvailable, Side maximizingSide, Heuristic givenHeurstic){
+        GameTreeNode rootNode = new GameTreeNode(board, swapAvailable , maximizingSide, searchDepth, givenHeurstic);
+        MinMaxAlphaBeta(rootNode, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, givenHeurstic);
         return rootNode;
     }
 
-    private double MinMaxAlphaBeta(GameTreeNode gameTreeNode, double alpha, double beta, Heuristic givenHeuristic){
+    public static GameTreeNode decideMove(Board board, boolean swapAvailable, Side maximizingSide, int depth, Heuristic givenHeurstic){
+        GameTreeNode rootNode = new GameTreeNode(board, swapAvailable , maximizingSide, depth, givenHeurstic);
+        MinMaxAlphaBeta(rootNode, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, givenHeurstic);
+        return rootNode;
+    }
+
+    private static double MinMaxAlphaBeta(GameTreeNode gameTreeNode, double alpha, double beta, Heuristic givenHeurstic){
         if (gameTreeNode.getDepth() == 0 || Kalah.gameOver(gameTreeNode.getCurrentBoard())){
             return gameTreeNode.getCurrentHeuristic();
         }
         if (gameTreeNode.getNextPlayerTurn() == gameTreeNode.getMaximizingPlayer()){
             double tempAlpha = Double.NEGATIVE_INFINITY;
-            for(GameTreeNode child : gameTreeNode.findChildren(givenHeuristic)){
+            for(GameTreeNode child : gameTreeNode.findChildren(givenHeurstic)){
                 if(child == null){
                     break;
                 }
-                tempAlpha = Math.max(tempAlpha, MinMaxAlphaBeta(child, alpha, beta, givenHeuristic));
+                tempAlpha = Math.max(tempAlpha, MinMaxAlphaBeta(child, alpha, beta, givenHeurstic) );
                 if (tempAlpha > alpha){
                     alpha = tempAlpha;
-                    gameTreeNode.setMinMaxMove(child.getParentMove());
+                    gameTreeNode.setBestChildGameTreeNode(child);
                 }
                 if(beta <= alpha){
                     break;
                 }
             }
-            gameTreeNode.removeBadChildren();
             return tempAlpha;
         }
         else {
             double tempBeta = Double.POSITIVE_INFINITY;
-            for(GameTreeNode child : gameTreeNode.findChildren(givenHeuristic)){
+            for(GameTreeNode child : gameTreeNode.findChildren(givenHeurstic)){
                 if(child == null){
                     break;
                 }
-                tempBeta = Math.min(tempBeta, MinMaxAlphaBeta(child, alpha, beta, givenHeuristic));
+                tempBeta = Math.min(tempBeta, MinMaxAlphaBeta(child, alpha, beta, givenHeurstic));
                 if (tempBeta < beta){
                     beta = tempBeta;
-                    gameTreeNode.setMinMaxMove(child.getParentMove());
+                    gameTreeNode.setBestChildGameTreeNode(child);
                 }
                 if(beta <= alpha){
                     break;
                 }
             }
-            gameTreeNode.removeBadChildren();
             return beta;
         }
     }
 
-
-
+    public static int getSearchDepth(){return searchDepth;}
 }
