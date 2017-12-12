@@ -55,4 +55,8 @@ public class MoveDecisionMaker {
     }
 
     public static int getSearchDepth(){return searchDepth;}
+    
+    public static void setSearchDepth(int depth){
+    	if (depth > 0 && (depth & 1) == 0);
+    	}
 }

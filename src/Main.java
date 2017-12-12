@@ -3,6 +3,7 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.util.Date;
 
 /**
  * The main application class. It also provides methods for communication with
@@ -57,8 +58,21 @@ public class Main {
 	public static void main(String[] args) {
 		// TODO: implement
 		// System.out.println("MOVE;2");
+		long startTime = new Date().getTime();
+		System.err.println(startTime);
+		
+		long totalTime = 0;
+		long[] threeTimes = new long[3];
+		
+		
 		int turn = 1;
+		int j = 0;
+		
+		long timeSum = 0;
+		
 		try {
+			
+			
 			String s;
 			Side side = Side.NORTH;
 			while (true) {
@@ -66,6 +80,39 @@ public class Main {
 				s = recvMsg();
 				System.err.print("Received: " + s);
 				try {
+					
+					j = 0;
+					timeSum = 0;
+					while (j < 3)
+					{
+						timeSum += threeTimes[j];
+						System.err.println(threeTimes[j]);
+						j++;
+						
+					}
+					
+					// if we get to 58 minutes then we need to get a move on or risk forfeiting
+					if (totalTime > 3480000)
+					{
+						System.err.println("Less than two minutes left, lowering depth!");
+						MoveDecisionMaker.setSearchDepth(6);
+					}
+					else if (turn > 5)
+					{
+						// if our last 3 moves took &20 seconds& then we're taking too long
+						if (timeSum > 20000)
+						{
+							System.err.println("Decision making is taking too long, lowering search depth...");
+							MoveDecisionMaker.setSearchDepth(MoveDecisionMaker.getSearchDepth() - 2);
+						}
+						// if our last 3 moves took less than &0.5 seconds& we can look a little deeper, probably
+						if (timeSum < 500)
+						{
+							System.err.println("Decision making is happening quickly, increasing search depth...");
+							MoveDecisionMaker.setSearchDepth(MoveDecisionMaker.getSearchDepth() + 2);
+						}
+					}
+					
 					MsgType mt = Protocol.getMessageType(s);
 					switch (mt) {
 					case START:
@@ -75,10 +122,21 @@ public class Main {
 
 						// If we are on the south side, we're going first.
 						if (first) {
+							long moveStartTime = new Date().getTime();
+							
+							
 							side = Side.SOUTH;
-
 							GameTreeNode node = MoveDecisionMaker.decideMove(new Board(7, 7), true, side);
 							int i = node.getMinMaxMove().getHole();
+							
+							long moveEndTime = new Date().getTime();
+							long moveTime = moveEndTime - moveStartTime;
+							System.err.println(moveTime);
+							totalTime += moveTime;
+							threeTimes[0] = threeTimes[1];
+							threeTimes[1] = threeTimes[2];
+							threeTimes[2] = moveTime;
+							
 							sendMsg(Protocol.createMoveMsg(i));
 						}
 						break;
@@ -107,9 +165,11 @@ public class Main {
 
 						
 						boolean canSwap = false;
-						//if (turn < 3) canSwap = true;
-						// If it's our turn, make the first legal move possible
+						if (turn < 3) canSwap = true;
 						if (r.again) {
+							
+							long moveStartTime = new Date().getTime();
+							
 							GameTreeNode node = MoveDecisionMaker.decideMove(b, canSwap, side);
 							if (node.getMinMaxMove() == null)
 								sendMsg(Protocol.createSwapMsg());
@@ -120,6 +180,15 @@ public class Main {
 							node = null;
 							sendMsg(Protocol.createMoveMsg(i));
 							}
+							
+							long moveEndTime = new Date().getTime();
+							long moveTime = moveEndTime - moveStartTime;
+							System.err.println(moveTime);
+							totalTime += moveTime;
+							threeTimes[0] = threeTimes[1];
+							threeTimes[1] = threeTimes[2];
+							threeTimes[2] = moveTime;
+							
 						}
 						break;
 					case END:
