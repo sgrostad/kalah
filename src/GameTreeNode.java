@@ -1,17 +1,16 @@
 public class GameTreeNode {
 
-    private GameTreeNode[] childGameTreeNodes;
+    private GameTreeNode bestChildGameTreeNode;
 
     private Board currentBoard;
 
     private Move parentMove;
-    private Move minMaxMove;
 
     private Side maximizingPlayer;
 
     private Side nextPlayerTurn;
-    private int depth; //TODO Agree how we define depth. Now it is decreasing only when changing turn.
 
+    private int depth; //TODO Agree how we define depth. Now it is decreasing only when changing turn.
     private boolean swapAvailable;
 
     private double currentHeuristic;
@@ -20,8 +19,9 @@ public class GameTreeNode {
     // Only called with root node:
 
     public GameTreeNode(Board currentBoard, boolean swapAvailable, Side maximizingPlayer, int searchDepth, Heuristic givenHeuristicObject){
-        childGameTreeNodes = null;
+        this.bestChildGameTreeNode = null;
         this.currentBoard = currentBoard;
+        this.parentMove = null;
         this.maximizingPlayer = maximizingPlayer;
         this.nextPlayerTurn = maximizingPlayer;
         this.depth = searchDepth;
@@ -29,9 +29,8 @@ public class GameTreeNode {
         this.currentHeuristic = 0;
         this.heuristicObject = givenHeuristicObject;
     }
-
     public GameTreeNode(GameTreeNode parentGameTreeNode, Move parentMove, Side maximizingPlayer, int depth, Heuristic givenHeuristicObject){
-        this.childGameTreeNodes = null;
+        this.bestChildGameTreeNode = null;
         currentBoard = new Board(parentGameTreeNode.getCurrentBoard());
         this.parentMove = parentMove;
         this.maximizingPlayer = maximizingPlayer;
@@ -48,7 +47,7 @@ public class GameTreeNode {
     }
 
     public GameTreeNode[] findChildren(Heuristic givenHeuristicObject){
-        childGameTreeNodes = new GameTreeNode[findNumLegalMoves()];
+        GameTreeNode[] childGameTreeNodes = new GameTreeNode[findNumLegalMoves()];
         int childNum = 0;
         for(int hole = 1; hole <= currentBoard.getNoOfHoles(); hole++){
             Move move = new Move(nextPlayerTurn, hole);
@@ -66,8 +65,7 @@ public class GameTreeNode {
             childGameTreeNodes[childNum] = new GameTreeNode(this, null, maximizingPlayer.opposite(), depth, givenHeuristicObject);
             childNum++;
         }
-
-        insertionSortChildren(childGameTreeNodes);
+        sortChildren(childGameTreeNodes, givenHeuristicObject);
         return childGameTreeNodes;
     }
 
@@ -86,7 +84,25 @@ public class GameTreeNode {
         return numberOfLegalMoves;
     }
 
-    private void insertionSortChildren(GameTreeNode[] childGameTreeNodes){
+    private void sortChildren(GameTreeNode[] childGameTreeNodes, Heuristic givenHeuristicObject){
+        int sortDepth;
+        MoveDecisionMaker givenDecisionMaker = new MoveDecisionMaker();
+        if(depth > 8 ) { //TODO experiment with this
+            sortDepth = 2;
+        }
+        else {
+            sortDepth = 1;
+        }
+        if (depth > 6){
+            for (GameTreeNode child : childGameTreeNodes) {
+                GameTreeNode smallSearchRoot = givenDecisionMaker.decideMove(child.currentBoard, false, maximizingPlayer, sortDepth, givenHeuristicObject);
+                child.setCurrentHeuristic(smallSearchRoot.getBottomHeuristic());
+            }
+        }
+        insertionSortChildren(childGameTreeNodes, maximizingPlayer == nextPlayerTurn);
+    }
+
+    private void insertionSortChildren(GameTreeNode[] childGameTreeNodes, boolean heuristicsWillBeDecreasing){
         for(int i = 1; i < childGameTreeNodes.length; i++){
             boolean sorting = true;
             int currentPlace = i;
@@ -94,10 +110,17 @@ public class GameTreeNode {
                 if(currentPlace == 0){
                     sorting = false;
                 }
-                else if (childGameTreeNodes[currentPlace] != null &&
-                        (childGameTreeNodes[currentPlace - 1] == null ||
-                         childGameTreeNodes[currentPlace].getCurrentHeuristic() >
-                         childGameTreeNodes[currentPlace - 1].getCurrentHeuristic()) ){
+                else if (childGameTreeNodes[currentPlace] != null && heuristicsWillBeDecreasing &&
+                        childGameTreeNodes[currentPlace].getCurrentHeuristic() >
+                         childGameTreeNodes[currentPlace - 1].getCurrentHeuristic()){
+                    GameTreeNode tempNode = childGameTreeNodes[currentPlace-1];
+                    childGameTreeNodes[currentPlace - 1] = childGameTreeNodes[currentPlace];
+                    childGameTreeNodes[currentPlace] = tempNode;
+                    currentPlace--;
+                }
+                else if (childGameTreeNodes[currentPlace] != null && !heuristicsWillBeDecreasing &&
+                        childGameTreeNodes[currentPlace].getCurrentHeuristic() <
+                                childGameTreeNodes[currentPlace - 1].getCurrentHeuristic()){
                     GameTreeNode tempNode = childGameTreeNodes[currentPlace-1];
                     childGameTreeNodes[currentPlace - 1] = childGameTreeNodes[currentPlace];
                     childGameTreeNodes[currentPlace] = tempNode;
@@ -108,6 +131,14 @@ public class GameTreeNode {
                 }
             }
         }
+    }
+
+    public GameTreeNode getBestChildGameTreeNode() {
+        return bestChildGameTreeNode;
+    }
+
+    public void setBestChildGameTreeNode(GameTreeNode bestChildGameTreeNode) {
+        this.bestChildGameTreeNode = bestChildGameTreeNode;
     }
 
     public Side getMaximizingPlayer() {
@@ -127,18 +158,11 @@ public class GameTreeNode {
     }
 
     public Move getParentMove() {
-        //if (this.parentMove == null)
-        //  System.out.println("Parent was null");
-
         return parentMove;
     }
 
     public Move getMinMaxMove() {
-        return minMaxMove;
-    }
-
-    public void setMinMaxMove(Move minMaxMove) {
-        this.minMaxMove = minMaxMove;
+        return bestChildGameTreeNode.parentMove;
     }
 
     public boolean isSwapAvailable() {
@@ -147,27 +171,15 @@ public class GameTreeNode {
 
     public double getCurrentHeuristic(){ return currentHeuristic; }
 
+    public void setCurrentHeuristic(double heuristic){this.currentHeuristic = heuristic;}
 
+    public double getBottomHeuristic(){
+        if(bestChildGameTreeNode == null){
+            return currentHeuristic;
+        }
+        else{
+            return bestChildGameTreeNode.getBottomHeuristic();
+        }
+    }
 
-
-     public void removeBadChildren(){
-         for (int i = 0; i < childGameTreeNodes.length; i++){
-             if (childGameTreeNodes[i] != null && notMinMaxMove(childGameTreeNodes[i])){
-                 childGameTreeNodes[i] = null;
-             }
-         }
-     }
- 
-     private boolean notMinMaxMove(GameTreeNode child){
-         if (minMaxMove == null && child.parentMove != null){
-             return true;
-         }
-         else if (minMaxMove == null && child.parentMove == null){
-             return false;
-         }
-         else if (minMaxMove.getHole() == child.parentMove.getHole()){
-             return false;
-         }
-         return true;
-     }
 }

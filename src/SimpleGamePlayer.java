@@ -3,18 +3,19 @@ import java.util.Scanner;
 public class SimpleGamePlayer {
 
     public static void main(String[] args){
-        Board board = new Board(6,6);
+        Board board = new Board(7,7);
         Side turn = Side.SOUTH;
         Move move;
         Side botSide = Side.NORTH;
         Side computerSide = botSide.opposite();
         //Scanner reader = new Scanner(System.in);
         boolean firstTurn = false;
-        Heuristic botHeuristic = new Heuristic(Double.parseDouble(args[0]), 
-                                               Double.parseDouble(args[1]),
-                                               Double.parseDouble(args[2]));
+        Heuristic botHeuristic = new Heuristic(Double.parseDouble(args[0]),
+                                               Double.parseDouble(args[1]), 
+                                               Double.parseDouble(args[2]),
+                                               Double.parseDouble(args[3]));
         
-        Heuristic computerHeuristic = new Heuristic(0.5,0.5,0.5);
+        Heuristic computerHeuristic = new Heuristic(0.2,0.1,0.8,0.5);
 
         MoveDecisionMaker computerDecisionMaker = new MoveDecisionMaker();
         MoveDecisionMaker botDecisionMaker = new MoveDecisionMaker();
@@ -26,7 +27,7 @@ public class SimpleGamePlayer {
         while(!Kalah.gameOver(board)){
     //        System.out.println(board.toString());
             
-    //        System.out.println(turn.toString() + " Bot's turn:");
+            System.out.println(turn.toString() + " Bot's turn:");
             
             if (turn == botSide) {
                 //System.out.println("Current bot Heuristic: " + Heuristic.advancedHeuristic(board, playerSide));

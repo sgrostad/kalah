@@ -1,6 +1,6 @@
 public class MoveDecisionMaker {
 
-    private static final int searchDepth = 10; //need to be even??? maybe not?
+    private static final int searchDepth = 12; //need to be even??? maybe not?
 
     public MoveDecisionMaker()
     {
@@ -18,6 +18,7 @@ public class MoveDecisionMaker {
         MinMaxAlphaBeta(rootNode, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, givenHeurstic);
         return rootNode;
     }
+    
 
     private static double MinMaxAlphaBeta(GameTreeNode gameTreeNode, double alpha, double beta, Heuristic givenHeurstic){
         if (gameTreeNode.getDepth() == 0 || Kalah.gameOver(gameTreeNode.getCurrentBoard())){
