@@ -1,10 +1,13 @@
 public class MoveDecisionMaker {
 
-    private static final int searchDepth = 8; //need to be even??? maybe not?
+	private static final int MAX_DEPTH = 18;
+	
+    private static int searchDepth = 10; //need to be even??? maybe not?
 
     public static GameTreeNode decideMove(Board board, boolean swapAvailable, Side maximizingSide){
         GameTreeNode rootNode = new GameTreeNode(board, swapAvailable , maximizingSide, searchDepth);
         MinMaxAlphaBeta(rootNode, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
+		System.err.println(searchDepth);
         return rootNode;
     }
 
@@ -57,6 +60,9 @@ public class MoveDecisionMaker {
     public static int getSearchDepth(){return searchDepth;}
     
     public static void setSearchDepth(int depth){
-    	if (depth > 0 && (depth & 1) == 0);
+    	if (depth > 0 && (depth & 1) == 0 && depth <= MAX_DEPTH)
+    		{
+    		searchDepth = depth;
+    		}
     	}
 }

@@ -3,9 +3,9 @@ public class Heuristic {
 
     //The following coefficients needs to be found by experimenting
     private static double stonesInStoreCoefficient = 2;
-    private static double stonesInHolesCoefficient = 0.5;
+    private static double stonesInHolesCoefficient = 0.1;
     private static double freeTurnMovesCoefficient = 0.5;
-    private static double maxStealSeedMoveCoefficient = 0.5;
+    private static double maxStealSeedMoveCoefficient = 0.7;
 
     // Every function ending with "Diff" are used to make heuristics. Actual heuristic in the bottom
     private static int stonesInStoreDiff(Board board, Side side){
@@ -79,14 +79,8 @@ public class Heuristic {
     }
 
     public static double advancedHeuristic(Board board, Side side){
-        if (Kalah.gameOver(board)){
-            if(board.getSeedsInStore(side) > board.getSeedsInStore(side.opposite())){
-                return Double.POSITIVE_INFINITY;
-            }
-            return Double.NEGATIVE_INFINITY;
-        }
         int minCoefficientValue = 1;
-        int maxCoefficientValue = 10;
+        int maxCoefficientValue = 5;
         int linearIncreasingCoefficient = calculateLinearIncreasingCoefficient(board, minCoefficientValue, maxCoefficientValue);
         return linearIncreasingCoefficient * stonesInStoreDiff(board, side)
                 + stonesInHolesCoefficient * stonesInHolesDiff(board, side)

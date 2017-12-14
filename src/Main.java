@@ -10,6 +10,13 @@ import java.util.Date;
  * the game engine.
  */
 public class Main {
+	
+	
+	private static long FAST_MOVE_TIME = 250;
+	private static long SLOW_MOVE_TIME = 90000;
+	private static long HURRY_UP_TIME = 3480000;
+	
+	
 	/**
 	 * Input from the game engine.
 	 */
@@ -92,7 +99,7 @@ public class Main {
 					}
 					
 					// if we get to 58 minutes then we need to get a move on or risk forfeiting
-					if (totalTime > 3480000)
+					if (totalTime > HURRY_UP_TIME)
 					{
 						System.err.println("Less than two minutes left, lowering depth!");
 						MoveDecisionMaker.setSearchDepth(6);
@@ -100,13 +107,13 @@ public class Main {
 					else if (turn > 5)
 					{
 						// if our last 3 moves took &20 seconds& then we're taking too long
-						if (timeSum > 20000)
+						if (timeSum > SLOW_MOVE_TIME)
 						{
 							System.err.println("Decision making is taking too long, lowering search depth...");
 							MoveDecisionMaker.setSearchDepth(MoveDecisionMaker.getSearchDepth() - 2);
 						}
 						// if our last 3 moves took less than &0.5 seconds& we can look a little deeper, probably
-						if (timeSum < 500)
+						if (timeSum < FAST_MOVE_TIME)
 						{
 							System.err.println("Decision making is happening quickly, increasing search depth...");
 							MoveDecisionMaker.setSearchDepth(MoveDecisionMaker.getSearchDepth() + 2);
