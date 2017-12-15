@@ -39,7 +39,7 @@ public class GameTreeNode {
             nextPlayerTurn = maximizingPlayer.opposite();
         }
         this.depth = depth;
-        this.swapAvailable = (parentGameTreeNode.isSwapAvailable() && MoveClassifier.isFirstMove(parentGameTreeNode.getCurrentBoard()) );
+        this.swapAvailable = (MoveClassifier.isFirstMove(parentGameTreeNode.getCurrentBoard()) );
         this.currentHeuristic = Heuristic.advancedHeuristic(currentBoard, maximizingPlayer);
     }
 
@@ -135,6 +135,7 @@ public class GameTreeNode {
 
     public void setBestChildGameTreeNode(GameTreeNode bestChildGameTreeNode) {
         this.bestChildGameTreeNode = bestChildGameTreeNode;
+        this.currentHeuristic = bestChildGameTreeNode.currentHeuristic;
     }
 
     public Side getMaximizingPlayer() {
