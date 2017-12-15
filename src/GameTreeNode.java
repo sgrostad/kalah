@@ -83,7 +83,7 @@ public class GameTreeNode {
 
     private void sortChildren(GameTreeNode[] childGameTreeNodes){
         int sortDepth;
-        if(depth > 8 ) { //TODO experiment with this
+        if(depth > 8 ) { 
             sortDepth = 2;
         }
         else {

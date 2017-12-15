@@ -12,9 +12,9 @@ import java.util.Date;
 public class Main {
 	
 	
-	private static long FAST_MOVE_TIME = 250;
-	private static long SLOW_MOVE_TIME = 90000;
-	private static long HURRY_UP_TIME = 3480000;
+	private static long FAST_MOVE_TIME = 10000;
+	private static long SLOW_MOVE_TIME = 60000;
+	private static long HURRY_UP_TIME = 3300000;
 	
 	
 	/**
@@ -69,7 +69,7 @@ public class Main {
 		System.err.println(startTime);
 		
 		long totalTime = 0;
-		long[] threeTimes = new long[3];
+		long[] fiveTimes = new long[5];
 		
 		
 		int turn = 1;
@@ -90,33 +90,34 @@ public class Main {
 					
 					j = 0;
 					timeSum = 0;
-					while (j < 3)
+					while (j < 5)
 					{
-						timeSum += threeTimes[j];
-						System.err.println(threeTimes[j]);
+						timeSum += fiveTimes[j];
+						System.err.println(fiveTimes[j]);
 						j++;
 						
 					}
+					timeSum = timeSum /5;
 					
 					// if we get to 58 minutes then we need to get a move on or risk forfeiting
 					if (totalTime > HURRY_UP_TIME)
 					{
 						System.err.println("Less than two minutes left, lowering depth!");
-						MoveDecisionMaker.setSearchDepth(6);
+						MoveDecisionMaker.setSearchDepth(8);
 					}
-					else if (turn > 5)
+					else if (turn > 10)
 					{
-						// if our last 3 moves took &20 seconds& then we're taking too long
+						// if our last 5 moves took &20 seconds& then we're taking too long
 						if (timeSum > SLOW_MOVE_TIME)
 						{
 							System.err.println("Decision making is taking too long, lowering search depth...");
-							MoveDecisionMaker.setSearchDepth(MoveDecisionMaker.getSearchDepth() - 2);
+							MoveDecisionMaker.setSearchDepth(MoveDecisionMaker.getSearchDepth() - 1);
 						}
-						// if our last 3 moves took less than &0.5 seconds& we can look a little deeper, probably
+						// if our last 5 moves took less than &0.5 seconds& we can look a little deeper, probably
 						if (timeSum < FAST_MOVE_TIME)
 						{
 							System.err.println("Decision making is happening quickly, increasing search depth...");
-							MoveDecisionMaker.setSearchDepth(MoveDecisionMaker.getSearchDepth() + 2);
+							MoveDecisionMaker.setSearchDepth(MoveDecisionMaker.getSearchDepth() + 1);
 						}
 					}
 					
@@ -140,9 +141,11 @@ public class Main {
 							long moveTime = moveEndTime - moveStartTime;
 							System.err.println(moveTime);
 							totalTime += moveTime;
-							threeTimes[0] = threeTimes[1];
-							threeTimes[1] = threeTimes[2];
-							threeTimes[2] = moveTime;
+							fiveTimes[0] = fiveTimes[1];
+							fiveTimes[1] = fiveTimes[2];
+							fiveTimes[2] = fiveTimes[3];
+							fiveTimes[3] = fiveTimes[4];
+							fiveTimes[4] = moveTime;
 							
 							// hole 1 does not provide a significant advantage or disadvantage to us according to our heuristics
 							// as such it cannot be exploited by the opponent using the pie rule
@@ -186,7 +189,10 @@ public class Main {
 							// if the opponent chooses 2, 3, or 4, as their first move going first
 							// it is advantageous to them according to our heuristics, so we should swap
 							if (turn == 2 && r.move > 1 && r.move < 5)
+							{
 								sendMsg(Protocol.createSwapMsg());
+							side = Side.SOUTH;
+							}
 							else{
 								
 							GameTreeNode node = MoveDecisionMaker.decideMove(b, canSwap, side);
@@ -199,9 +205,11 @@ public class Main {
 							long moveTime = moveEndTime - moveStartTime;
 							System.err.println(moveTime);
 							totalTime += moveTime;
-							threeTimes[0] = threeTimes[1];
-							threeTimes[1] = threeTimes[2];
-							threeTimes[2] = moveTime;
+							fiveTimes[0] = fiveTimes[1];
+							fiveTimes[1] = fiveTimes[2];
+							fiveTimes[2] = fiveTimes[3];
+							fiveTimes[3] = fiveTimes[4];
+							fiveTimes[4] = moveTime;
 							
 						}
 						break;

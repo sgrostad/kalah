@@ -2,7 +2,7 @@ public class MoveDecisionMaker {
 
 	private static final int MAX_DEPTH = 18;
 	
-    private static int searchDepth = 10; //need to be even??? maybe not?
+    private static int searchDepth = 12;
 
     public static GameTreeNode decideMove(Board board, boolean swapAvailable, Side maximizingSide){
         GameTreeNode rootNode = new GameTreeNode(board, swapAvailable , maximizingSide, searchDepth);
@@ -60,7 +60,7 @@ public class MoveDecisionMaker {
     public static int getSearchDepth(){return searchDepth;}
     
     public static void setSearchDepth(int depth){
-    	if (depth > 0 && (depth & 1) == 0 && depth <= MAX_DEPTH)
+    	if (depth > 0 && depth <= MAX_DEPTH)
     		{
     		searchDepth = depth;
     		}

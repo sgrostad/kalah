@@ -2,14 +2,8 @@
 public class Heuristic {
 
     //The following coefficients needs to be found by experimenting
-    private static int stonesInStoreMaxCoefficient = 7;
-    private static int stonesInStoreMinCoefficient = 7;
-    private static int stonesInHolesMaxCoefficient = 3;
-    private static int stonesInHolesMinCoefficient = 1;
-    private static int freeTurnMovesMaxCoefficient = 5;
-    private static int freeTurnMovesMinCoefficient = 5;
-    private static int maxStealSeedMoveMaxCoefficient = 9;
-    private static int maxStealSeedMoveMinCoefficient = 1;
+    private static double stonesInHolesCoefficient = 0.4;
+    private static double maxStealSeedMoveCoefficient = 0.7;
 
     // Every function ending with "Diff" are used to make heuristics. Actual heuristic in the bottom
     private static int stonesInStoreDiff(Board board, Side side){
@@ -78,9 +72,10 @@ public class Heuristic {
     }
 
     public static double advancedHeuristic(Board board, Side side){
-        return calculateLinearIncreasingCoefficient(board,stonesInStoreMinCoefficient,stonesInStoreMaxCoefficient) * stonesInStoreDiff(board, side)
-                + calculateLinearIncreasingCoefficient(board,stonesInHolesMinCoefficient,stonesInHolesMaxCoefficient) * stonesInHolesDiff(board, side)
-                + calculateLinearIncreasingCoefficient(board,freeTurnMovesMinCoefficient,freeTurnMovesMaxCoefficient) * freeTurnMovesDiff(board, side)
-                + calculateLinearIncreasingCoefficient(board,maxStealSeedMoveMinCoefficient,maxStealSeedMoveMaxCoefficient) * maxStealMoveDiff(board, side);
+    	int increasingCoefficient = calculateLinearIncreasingCoefficient(board, 1, 5);
+        return increasingCoefficient * stonesInStoreDiff(board, side)
+                + stonesInHolesCoefficient * stonesInHolesDiff(board, side)
+                + increasingCoefficient * freeTurnMovesDiff(board, side)
+                + maxStealSeedMoveCoefficient * maxStealMoveDiff(board, side);
     }
 }
