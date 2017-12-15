@@ -133,8 +133,8 @@ public class Main {
 							
 							
 							side = Side.SOUTH;
-							GameTreeNode node = MoveDecisionMaker.decideMove(new Board(7, 7), true, side);
-							int i = node.getMinMaxMove().getHole();
+							//GameTreeNode node = MoveDecisionMaker.decideMove(new Board(7, 7), true, side);
+							//int i = node.getMinMaxMove().getHole();
 							
 							long moveEndTime = new Date().getTime();
 							long moveTime = moveEndTime - moveStartTime;
@@ -144,7 +144,9 @@ public class Main {
 							threeTimes[1] = threeTimes[2];
 							threeTimes[2] = moveTime;
 							
-							sendMsg(Protocol.createMoveMsg(i));
+							// hole 1 does not provide a significant advantage or disadvantage to us according to our heuristics
+							// as such it cannot be exploited by the opponent using the pie rule
+							sendMsg(Protocol.createMoveMsg(1));
 						}
 						break;
 					case STATE:
@@ -172,17 +174,22 @@ public class Main {
 
 						
 						boolean canSwap = false;
-						if (turn < 3) canSwap = true;
+						//if (turn < 3) canSwap = true;
 						if (r.again) {
+
+							
 							
 							long moveStartTime = new Date().getTime();
 							
-							GameTreeNode node = MoveDecisionMaker.decideMove(b, canSwap, side);
-							if (node.getMinMaxMove() == null)
+							//if (node.getMinMaxMove() == null)
+							
+							// if the opponent chooses 2, 3, or 4, as their first move going first
+							// it is advantageous to them according to our heuristics, so we should swap
+							if (turn == 2 && r.move > 1 && r.move < 5)
 								sendMsg(Protocol.createSwapMsg());
 							else{
 								
-							
+							GameTreeNode node = MoveDecisionMaker.decideMove(b, canSwap, side);
 							int i = node.getMinMaxMove().getHole();
 							node = null;
 							sendMsg(Protocol.createMoveMsg(i));
